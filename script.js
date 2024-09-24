@@ -91,13 +91,13 @@ const main = document.querySelector('main');
 class Marker{
     constructor(color, tank){
         this.color = color;
-        this.tank= tank;
+        this.tank = tank;
     }
     get getColor(){
         return this.color;
     }
     get getTank() {
-        return `${this.tank}%`;
+        return Number.isInteger(this.tank) ? `${this.tank}.0%` : `${this.tank.toFixed(1)}%`;
     }
 
     writing(){
@@ -116,8 +116,58 @@ class ModernMarker extends Marker{
     }
 }
 
-const modernBlueMarker = new ModernMarker('blue', 200)
 
-modernBlueMarker.putInkToTank = 100
 
-console.log(modernBlueMarker)
+
+function createDesc() {
+    const desc = document.createElement('section');
+    const counter = document.createElement('div');
+    const display = document.createElement('div');
+
+    const button = document.createElement('button');
+    counter.classList.add('counter');
+    display.classList.add('display');
+    button.classList.add('button');
+
+
+    let step = 0;
+
+    const modernBlueMarker = new ModernMarker('blue', 10);
+
+    button.innerHTML = "set 10";
+    button.value = 10;
+    button.onclick = () => {
+        modernBlueMarker.putInkToTank = Number(button.value); 
+        renderCounter()
+    };
+    display.style.color = modernBlueMarker.getColor;
+
+    function renderCounter() {
+        counter.innerText = modernBlueMarker.getTank;
+        const time = Math.floor(Math.random() * (1000 - 200 + 1)) + 200; // Генерация случайного времени
+
+        if (modernBlueMarker.tank > 0) {
+            modernBlueMarker.writing();
+
+  
+            setTimeout(() => {
+                step++;
+                renderCounter();  // Рекурсивно вызываем renderCounter после случайного времени
+                display.innerText +=` ${step}`
+            }, time);
+        } else {
+            counter.innerText = "empty";  // Когда заканчивается чернила
+        }
+
+        desc.append(counter, display);
+    }
+
+    if (modernBlueMarker.tank > 0) {
+        renderCounter();  // Запускаем процесс
+    }
+    desc.append(button)
+    
+    main.append(desc);
+}
+
+createDesc();
