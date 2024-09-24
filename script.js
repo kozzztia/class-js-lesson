@@ -88,86 +88,111 @@ const main = document.querySelector('main');
 
 // Продемонструй роботу написаних методів.
 
-class Marker{
-    constructor(color, tank){
+class Marker {
+    constructor(color, tank) {
         this.color = color;
         this.tank = tank;
     }
-    get getColor(){
+    get getColor() {
         return this.color;
     }
     get getTank() {
         return Number.isInteger(this.tank) ? `${this.tank}.0%` : `${this.tank.toFixed(1)}%`;
     }
-
-    writing(){
+    writing() {
         this.tank -= 0.5;
     }
 }
 
-
-class ModernMarker extends Marker{
-    constructor(color, tank){
-        super(color, tank)
+class ModernMarker extends Marker {
+    constructor(color, tank) {
+        super(color, tank);
+        this.text = "";
+    }
+    set setText(value) {
+        this.text = value;
     }
 
-    set putInkToTank(value){
-        this.tank += value
+    set putInkToTank(value) {
+        this.tank += value;
     }
 }
-
-
-
 
 function createDesc() {
     const desc = document.createElement('section');
     const counter = document.createElement('div');
     const display = document.createElement('div');
-
+    const form = document.createElement('form');
+    const input = document.createElement('input');
+    const submit = document.createElement('button');
     const button = document.createElement('button');
+
     counter.classList.add('counter');
     display.classList.add('display');
     button.classList.add('button');
-
-
-    let step = 0;
+    form.classList.add('form');
+    submit.innerHTML = "push";
+    input.type = "text";
+    input.name = "text";
 
     const modernBlueMarker = new ModernMarker('blue', 10);
+
+    let step = 0;
+    let interval;
+
+    form.onsubmit = (e) => {
+        e.preventDefault();
+        const text = e.target.text.value;
+        if (text) {
+            modernBlueMarker.setText = text;
+            e.target.text.value = "";
+            step = 0;
+            renderCounter();
+        } else {
+            input.placeholder = "insert text";
+        }
+    };
 
     button.innerHTML = "set 10";
     button.value = 10;
     button.onclick = () => {
-        modernBlueMarker.putInkToTank = Number(button.value); 
-        renderCounter()
+        modernBlueMarker.putInkToTank = Number(button.value);
+        clearInterval(interval);
+        renderCounter();
     };
+
     display.style.color = modernBlueMarker.getColor;
 
     function renderCounter() {
         counter.innerText = modernBlueMarker.getTank;
-        const time = Math.floor(Math.random() * (1000 - 200 + 1)) + 200; // Генерация случайного времени
+        const time = Math.floor(Math.random() * (1000 - 200 + 1)) + 200;
 
-        if (modernBlueMarker.tank > 0) {
-            modernBlueMarker.writing();
+        const textArray = modernBlueMarker.text.split("");
 
-  
+        if (modernBlueMarker.tank > 0 && step < textArray.length) {
+            const currentChar = textArray[step];
+
+            if (currentChar !== " ") {
+                modernBlueMarker.writing(); 
+            }
+            
             setTimeout(() => {
-                step++;
-                renderCounter();  // Рекурсивно вызываем renderCounter после случайного времени
-                display.innerText +=` ${step}`
+                display.innerHTML += currentChar === " " ? "&nbsp;" : currentChar; 
+                step++; 
+                renderCounter();  
             }, time);
-        } else {
-            counter.innerText = "empty";  // Когда заканчивается чернила
+        } else if (modernBlueMarker.tank <= 0) {
+            counter.innerText = "empty"; 
         }
 
         desc.append(counter, display);
     }
+    renderCounter();
 
-    if (modernBlueMarker.tank > 0) {
-        renderCounter();  // Запускаем процесс
-    }
-    desc.append(button)
-    
-    main.append(desc);
+    form.append(input, submit);
+    desc.append(button, form);
+
+    main.append(desc);  
 }
 
 createDesc();
