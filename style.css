@@ -35,25 +35,23 @@ body {
     font-size: var(--font-size);
 }
 
-header,
-main,
-footer {
+
+main {
     max-width: var(--max-width);
     padding: var(--padding);
     border: var(--border);
+    background: var(--main-color);
     margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-header {
-    height: var(--header-height);
-    background: var(--main-color);
+
+.circle{
+    border-radius: 50%;
+    border: 1px solid var(--background-color)
 }
 
-footer {
-    background: var(--main-color);
-    height: var(--footer-height);
-}
-
-main {
-    min-height: calc(100vh - var(--header-height) - var(--footer-height));
-}
